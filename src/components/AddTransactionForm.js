@@ -1,9 +1,41 @@
-import React from "react";
+import React, {useState} from "react";
 
-function AddTransactionForm() {
+function AddTransactionForm({ setTransactions }) {
+  const [formData, setFormData] = useState({
+    date: "",
+    description: "",
+    category: "",
+    amount: 0,
+  })
+
+  const handleFormSumbit = async (e) => {
+    e.preventDefault();
+    try {
+      const response = await fetch("/transactions", {
+        method:"POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(formData),
+      });
+      const newTransaction = await response.json();
+
+      setTransactions((prevTransactions) => [...prevTransactions, newTransaction]);
+
+      setFormData({
+        date: "",
+        description: "",
+        category: "",
+        amount: 0,
+      });
+    } catch (error) {
+      console.error("Error addind transaction:", error)
+    }
+  };
+
   return (
     <div className="ui segment">
-      <form className="ui form">
+      <form className="ui form" onSubmit={handleFormSumbit}>
         <div className="inline fields">
           <input type="date" name="date" />
           <input type="text" name="description" placeholder="Description" />
